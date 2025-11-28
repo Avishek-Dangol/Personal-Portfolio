@@ -1,64 +1,145 @@
-import meter1 from "../assets/img/meter1.svg";
-import meter2 from "../assets/img/meter2.svg";
-import meter3 from "../assets/img/meter3.svg";
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
-import arrow1 from "../assets/img/arrow1.svg";
-import arrow2 from "../assets/img/arrow2.svg";
-import colorSharp from "../assets/img/color-sharp.png"
+import iconCpp from "../assets/img/C++.png";
+import iconPython from "../assets/img/python.png";
+import iconGithub from "../assets/img/github.png";
+import iconHtml from "../assets/img/html.png";
+import iconCss from "../assets/img/css3.png";
+import iconJs from "../assets/img/javascript.png";
+import sunnyMist from "../assets/img/sunnyMist.png";
+import { useEffect, useState, useRef } from "react";
 
 export const Skills = () => {
-  const responsive = {
-    superLargeDesktop: {
-      // the naming can be any, depends on you.
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5
-    },
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 3
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 2
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1
+  // Ref for the section to observe visibility
+  const sectionRef = useRef(null);
+  // State to track if the animation should run (true after first entry)
+  const [hasEntered, setHasEntered] = useState(false);
+
+  // Parallax effect for the mist (kept the original logic)
+  useEffect(() => {
+    const mist = document.querySelector(".skill-mist");
+
+    const handleScroll = () => {
+      // Check if the element exists before trying to access its style
+      if (mist) {
+        const offset = window.scrollY * 0.08; // adjust depth here
+        // The animation will keep running on every scroll, up or down
+        mist.style.transform = `translate(-50%, calc(-50% + ${offset}px))`;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Intersection Observer for the one-time entry animation trigger
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Only trigger if the section is intersecting AND it hasn't entered before
+        // `entry.boundingClientRect.top` is used to check scroll direction
+        if (
+          entry.isIntersecting &&
+          !hasEntered &&
+          entry.boundingClientRect.top > 0
+        ) {
+          setHasEntered(true);
+          // Disconnect observer after it runs once
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        root: null, // viewport as root
+        rootMargin: "0px",
+        threshold: 0.2, // Trigger when 20% of the section is visible
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
-  };
+
+    // Cleanup function
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, [hasEntered]);
+
+  const skills = [
+    { id: 1, name: "C++", icon: iconCpp, delay: 0.1, duration: 1.2 },
+    {
+      id: 2,
+      name: "Python (scripting)",
+      icon: iconPython,
+      delay: 0.3,
+      duration: 1.0,
+    },
+    { id: 3, name: "GitHub", icon: iconGithub, delay: 0.5, duration: 1.4 },
+    { id: 4, name: "HTML", icon: iconHtml, delay: 0.2, duration: 0.9 },
+    { id: 5, name: "CSS3", icon: iconCss, delay: 0.4, duration: 1.3 },
+    { id: 6, name: "JavaScript", icon: iconJs, delay: 0.6, duration: 1.1 },
+  ];
 
   return (
-    <section className="skill" id="skills">
-        <div className="container">
-            <div className="row">
-                <div className="col-12">
-                    <div className="skill-bx wow zoomIn">
-                        <h2>Skills</h2>
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.<br></br> Lorem Ipsum has been the industry's standard dummy text.</p>
-                        <Carousel responsive={responsive} infinite={true} className="owl-carousel owl-theme skill-slider">
-                            <div className="item">
-                                <img src={meter1} alt="Image" />
-                                <h5>Web Development</h5>
-                            </div>
-                            <div className="item">
-                                <img src={meter2} alt="Image" />
-                                <h5>Brand Identity</h5>
-                            </div>
-                            <div className="item">
-                                <img src={meter3} alt="Image" />
-                                <h5>Logo Design</h5>
-                            </div>
-                            <div className="item">
-                                <img src={meter1} alt="Image" />
-                                <h5>Web Development</h5>
-                            </div>
-                        </Carousel>
+    <section
+      className="skill"
+      id="skills"
+      aria-label="Skills section"
+      ref={sectionRef} // Attach ref here
+    >
+      {/* Keeping the mist image for the ambient effect */}
+      <img src={sunnyMist} alt="morning mist" className="skill-mist" />
+
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <div className="skill-bx">
+              <h2>Skills</h2>
+              <p>
+                Here are some of my main technical skills. For the full list and
+                details, view my resume below.
+              </p>
+
+              <div className="skills-grid" role="list">
+                {skills.map((s) => (
+                  <div
+                    className={`skill-card ${hasEntered ? "animate" : ""}`}
+                    role="listitem"
+                    key={s.id}
+                    // Apply inline styles for variable animation
+                    style={{
+                      "--animation-delay": `${s.delay}s`,
+                      "--animation-duration": `${s.duration}s`,
+                    }}
+                  >
+                    <div className="skill-icon-wrapper">
+                      <img
+                        src={s.icon}
+                        alt={`${s.name} icon`}
+                        className="skill-icon"
+                      />
                     </div>
-                </div>
+                    <div className="skill-name">{s.name}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="skill-cta">
+                <a
+                  className="btn-resume"
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Learn More
+                </a>
+              </div>
             </div>
+          </div>
         </div>
-        <img className="background-image-left" src={colorSharp} alt="Image" />
+      </div>
     </section>
-  )
-}
+  );
+};
+
+export default Skills;

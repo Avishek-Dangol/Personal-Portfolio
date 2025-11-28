@@ -11,14 +11,15 @@ export const Banner = () => {
   const [loopNum, setLoopNum] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [text, setText] = useState("");
-  const [delta, setDelta] = useState(300 - Math.random() * 100);
-  const [index, setIndex] = useState(1);
+  const [delta, setDelta] = useState(120); // 100 WPM = ~120ms per character
   const toRotate = [
-    "Data Analyst in the Making",
-    "ML-Driven Problem Solver",
-    "C++ Focused Engineer",
+    "Aspiring Data Analyst",
+    "ML-Driven Analyst",
+    "C++ Developer",
   ];
-  const period = 2000;
+  const typingSpeed = 120; // ~100 WPM
+  const deletingSpeed = 40; // Fast, smooth backspace
+  const pauseAfterComplete = 1500; // Pause when word is fully typed
 
   // Intersection Observer for fade-in effect
   const { ref: textRef, inView: textInView } = useInView({ triggerOnce: true });
@@ -30,7 +31,7 @@ export const Banner = () => {
     }, delta);
 
     return () => clearInterval(ticker);
-  }, [text]);
+  }, [text, delta]);
 
   const tick = () => {
     let i = loopNum % toRotate.length;
@@ -41,21 +42,23 @@ export const Banner = () => {
 
     setText(updatedText);
 
+    // Smooth, consistent backspacing
     if (isDeleting) {
-      setDelta((prevDelta) => prevDelta / 2);
+      setDelta(deletingSpeed);
+    } else {
+      setDelta(typingSpeed);
     }
 
+    // When fully typed, pause then start deleting
     if (!isDeleting && updatedText === fullText) {
       setIsDeleting(true);
-      setIndex((prevIndex) => prevIndex - 1);
-      setDelta(period);
-    } else if (isDeleting && updatedText === "") {
+      setDelta(pauseAfterComplete);
+    }
+    // When fully deleted, move to next word
+    else if (isDeleting && updatedText === "") {
       setIsDeleting(false);
       setLoopNum(loopNum + 1);
-      setIndex(1);
-      setDelta(500);
-    } else {
-      setIndex((prevIndex) => prevIndex + 1);
+      setDelta(typingSpeed);
     }
   };
 
@@ -72,7 +75,8 @@ export const Banner = () => {
             >
               <span className="tagline">Welcome to my Portfolio</span>
               <h1>
-                {`Hi! I'm Avishek Dangol, a`}{" "}
+                {`Hi! I'm Avishek Dangol, a`}
+                <br />{" "}
                 <span className="txt-rotate">
                   <span className="wrap">{text}</span>
                 </span>

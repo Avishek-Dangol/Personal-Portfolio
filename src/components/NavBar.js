@@ -12,11 +12,37 @@ const scrollToId = (id) => {
     el.scrollIntoView({ behavior: "smooth" });
   }
 };
+const useIntersectionObserver = (selector) => {
+  const [isVisible, setIsVisible] = useState(false);
 
+  useEffect(() => {
+    const target = document.querySelector(selector);
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Update state when the target enters or leaves the viewport
+        setIsVisible(entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0.1, // trigger when 10% of the footer is visible
+      }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      if (target) observer.unobserve(target);
+    };
+  }, [selector]);
+
+  return isVisible;
+};
 export const NavBar = () => {
   const [activeLink, setActiveLink] = useState("home");
   const [scrolled, setScrolled] = useState(false);
-
+  const footerVisible = useIntersectionObserver(".footer");
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -34,7 +60,12 @@ export const NavBar = () => {
 
   return (
     <Router>
-      <Navbar expand="md" className={scrolled ? "scrolled" : ""}>
+      <Navbar
+        expand="md"
+        className={`${scrolled ? "scrolled" : ""} ${
+          footerVisible ? "hidden-by-footer" : ""
+        }`}
+      >
         <Container>
           <Navbar.Brand href="/">
             <img

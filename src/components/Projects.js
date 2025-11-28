@@ -1,125 +1,100 @@
 import { Container, Row, Col, Carousel } from "react-bootstrap";
-import colorSharp2 from "../assets/img/color-sharp2.png";
-import "animate.css";
-import { useInView } from "react-intersection-observer";
+import projImg1 from "../assets/img/DataForcasting.png";
+import projImg2 from "../assets/img/SnakeGame.png";
+import projImg3 from "../assets/img/PersonalPortfolio.png";
+import arrowLeft from "../assets/img/arrow1.svg";
+import arrowRight from "../assets/img/arrow2.svg";
+import sunnyMist from "../assets/img/sunnyMist.png";
+
+const ProjectCard = ({ description, imgUrl, gitHubUrl }) => {
+  return (
+    <div className="proj-imgbx">
+      <img src={imgUrl} alt="Project" />
+      <div className="proj-txtx">
+        <a href={gitHubUrl} target="_blank" rel="noopener noreferrer">
+          {/* Only display the description in the hover overlay */}
+          <span>{description}</span>
+        </a>
+      </div>
+    </div>
+  );
+};
 
 export const Projects = () => {
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    rootMargin: "0px 0px -100px 0px",
-  });
-
   const projects = [
     {
-      title: "Project Alpha",
-      description: "E-commerce Website Design",
-      /*imgUrl: projImg3,*/
-      githubUrl: "https://github.com/yourusername/project-alpha",
-      // Custom content for a cleaner look
-      customContent: "Project Alpha: E-commerce Website",
+      title: "Data Forecasting",
+      description:
+        "A ML-integrated Data Forecasting and Analysis tool to forcast Stock and Crypto Currency prices.",
+      imgUrl: projImg1,
+      gitHubUrl: "https://github.com/Avishek-Dangol/DataForecasting",
     },
     {
-      title: "Project Beta",
-      description: "Mobile App Development",
-      /*imgUrl: projImg3,*/
-      githubUrl: "https://github.com/yourusername/project-beta",
-      customContent: "Project Beta: Mobile Application",
+      title: "Java Snake Game",
+      description: "A classic Snake Game implemented using Java.",
+      imgUrl: projImg2,
+      gitHubUrl: "https://github.com/Avishek-Dangol/snake-game-java",
     },
     {
-      title: "Project Gamma",
-      description: "Data Visualization Tool",
-      /*imgUrl: projImg3,*/
-      githubUrl: "https://github.com/yourusername/project-gamma",
-      customContent: "Project Gamma: Data Visualization",
+      title: "Personal Portfolio Website",
+      description: "Design & Development of this personal portfolio.",
+      imgUrl: projImg3,
+      gitHubUrl: "https://github.com/Avishek-Dangol/Personal-Portfolio",
     },
   ];
 
-  // Inline styles for the carousel content to mimic the dark, centralized look
-  const carouselContentStyle = {
-    minHeight: "400px", // Set a minimum height for the carousel area
-    display: "flex",
-    alignItems: "center", // Vertically center the content
-    justifyContent: "center", // Horizontally center the content
-    backgroundColor: "#383838", // Dark gray background for the slide area
-    color: "#CCCCCC", // Light gray text color
-    padding: "50px 0",
-  };
-
   return (
-    // Applied a darker background to the whole section for the dark mode feel
     <section className="project" id="projects">
+      <img src={sunnyMist} alt="morning mist" className="project-mist" />
       <Container>
         <Row>
           <Col size={12}>
-            <div ref={ref}>
-              <div
-                className={inView ? "animate__animated animate__fadeIn" : ""}
+            <div className="project-content-wrapper">
+              <h2>My Projects</h2>
+              <p>
+                Here are some of the projects I've worked on. Hover over the
+                image to see the description and click to view the GitHub
+                repository.
+              </p>
+              <Carousel
+                indicators={true}
+                interval={null}
+                controls={true}
+                prevIcon={
+                  <img
+                    src={arrowLeft}
+                    alt="Previous"
+                    className="carousel-arrow"
+                  />
+                }
+                nextIcon={
+                  <img src={arrowRight} alt="Next" className="carousel-arrow" />
+                }
               >
-                <h2 style={{ color: "#FFFFFF" }}>Projects</h2>
-                <p style={{ color: "#AAAAAA" }}>
-                  Click on any project slide to view the source code on GitHub.
-                </p>
+                {projects.map((project, index) => (
+                  <Carousel.Item key={index}>
+                    {/* Display the project title centered above the image */}
+                    <div className="project-title-display">
+                      <h3>{project.title}</h3>
+                    </div>
 
-                {/* --- Carousel Implementation --- */}
-                <Carousel
-                  indicators={true}
-                  controls={true}
-                  id="projects-carousel"
-                  className={
-                    inView ? "animate__animated animate__slideInUp" : ""
-                  }
-                  interval={null}
-                >
-                  {projects.map((project, index) => (
-                    <Carousel.Item key={index}>
-                      {/* The style is applied here to the content area */}
-                      <div style={carouselContentStyle}>
-                        <Row className="justify-content-center w-100">
-                          <Col xs={12} className="text-center">
-                            {/* Anchor tag wraps the custom ProjectCard display */}
-                            <a
-                              href={project.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              // Style the link to remove text decoration and make it block-level
-                              style={{
-                                textDecoration: "none",
-                                display: "block",
-                                color: "inherit",
-                              }}
-                            >
-                              {/* Option 1: Display simple centered text like your image (First slide) */}
-                              <h3 style={{ fontSize: "3rem", fontWeight: 300 }}>
-                                {project.customContent}
-                              </h3>
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  backgroundColor: "black",
-                                  color: "white",
-                                  padding: "5px 10px",
-                                  marginBottom: "20px",
-                                }}
-                              >
-                                Placeholder
-                              </span>
-                            </a>
-                          </Col>
-                        </Row>
-                      </div>
-                    </Carousel.Item>
-                  ))}
-                </Carousel>
-              </div>
+                    <Row className="justify-content-center">
+                      <Col xs={12} md={8} lg={6}>
+                        {/* Pass remaining props to ProjectCard */}
+                        <ProjectCard
+                          description={project.description}
+                          imgUrl={project.imgUrl}
+                          gitHubUrl={project.gitHubUrl}
+                        />
+                      </Col>
+                    </Row>
+                  </Carousel.Item>
+                ))}
+              </Carousel>
             </div>
           </Col>
         </Row>
       </Container>
-      <img
-        className="background-image-right"
-        src={colorSharp2}
-        alt="Background design element"
-      ></img>
     </section>
   );
 };
